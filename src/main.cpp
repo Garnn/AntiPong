@@ -6,6 +6,7 @@
 #include "SFML/Window/Keyboard.hpp"
 #include <SFML/Graphics.hpp>
 #include <math.h>
+#include "SFML/Window/Mouse.hpp"
 #include "balls.cpp"
 
 #define WIDTH 500
@@ -37,7 +38,7 @@ int main()
             
         }
 
-        //Obsługa ruchu
+        //Obsługa ruchu gracza
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
                 player.move(0,-2);
         }
@@ -53,6 +54,8 @@ int main()
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
                 player.move(2,0);
         }
+
+        //Kolizja gracza z oknem gry
         if (player.getPosition().x>WIDTH-10.f) {
             player.setPosition(WIDTH-10.f,player.getPosition().y);
         }
@@ -66,6 +69,20 @@ int main()
             player.setPosition(player.getPosition().x,0);
         }
 
+        //Teleportacja
+        sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+
+        // sf::Vertex testLine[] = {
+        //     sf::Vertex(sf::Vector2f(player.getPosition().x+5.f,player.getPosition().y+5.f)),
+        //     sf::Vertex(sf::Vector2f(mousePosition))
+        // };
+
+        // window.draw(testLine,2,sf::Lines);
+
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                player.setPosition(sf::Vector2f(mousePosition));
+        }
+
         //Zachowanie kulek
         a.move();
 
@@ -73,17 +90,11 @@ int main()
         //Czyszczenie ekranu
         window.clear(sf::Color(100,100,100));
 
-        sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-
-        sf::Vertex testLine[] = {
-            sf::Vertex(sf::Vector2f(player.getPosition().x+5.f,player.getPosition().y+5.f)),
-            sf::Vertex(sf::Vector2f(mousePosition))
-        };
+        
 
         //float a = (mousePosition.x-player.getPosition().x)/(mousePosition.y-player.getPosition().y);
         
         window.draw(a.circ);
-        window.draw(testLine,2,sf::Lines);
         window.draw(player);
         window.display();
     }
