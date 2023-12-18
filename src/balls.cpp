@@ -16,17 +16,21 @@ class BlackBall{
         }
 
         void check_bounds(){
-            if (_position.x>=_upperXLim) {
+            if (_position.x>_upperXLim) {
                 _direction+=90;
+                _position.x-=(_position.x-_upperXLim);
             }
-            if (_position.x<=_lowerXLim) {
+            if (_position.x<_lowerXLim) {
                 _direction+=90;
+                _position.x-=(_position.x-_lowerXLim);
             }
-            if (_position.y>=_upperYLim) {
+            if (_position.y>_upperYLim) {
                 _direction+=90;
+                _position.y-=(_position.y-_upperYLim);
             }
-            if (_position.y<=_lowerYLim) {
+            if (_position.y<_lowerYLim) {
                 _direction+=90;
+                _position.y-=(_position.y-_lowerYLim);
             }
         }
     public:

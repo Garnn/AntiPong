@@ -20,7 +20,7 @@ int main()
     player.setFillColor(sf::Color::White);
     player.setPosition(window.getSize().x/2.f,window.getSize().y/2.f);
 
-    BlackBall a = BlackBall(sf::Vector2f(WIDTH/2.f, HEIGHT/2.f), 30.f, 10.f, 0, (float)WIDTH, 0, (float)HEIGHT);
+    BlackBall a = BlackBall(sf::Vector2f(WIDTH/2.f, HEIGHT/2.f), 30.f, 5.f, 0, (float)WIDTH, 0, (float)HEIGHT);
 
     while (window.isOpen())
     {
@@ -53,13 +53,25 @@ int main()
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
                 player.move(2,0);
         }
+        if (player.getPosition().x>WIDTH-10.f) {
+            player.setPosition(WIDTH-10.f,player.getPosition().y);
+        }
+        if (player.getPosition().x<0) {
+            player.setPosition(0,player.getPosition().y);
+        }
+        if (player.getPosition().y>HEIGHT-10.f) {
+            player.setPosition(player.getPosition().x,HEIGHT-10.f);
+        }
+        if (player.getPosition().y<0) {
+            player.setPosition(player.getPosition().x,0);
+        }
 
         //Zachowanie kulek
         a.move();
 
 
         //Czyszczenie ekranu
-        window.clear(sf::Color(50,50,50));
+        window.clear(sf::Color(100,100,100));
 
         sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 
