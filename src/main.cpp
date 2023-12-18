@@ -6,16 +6,21 @@
 #include "SFML/Window/Keyboard.hpp"
 #include <SFML/Graphics.hpp>
 #include <math.h>
+#include "balls.cpp"
+
+#define WIDTH 500
+#define HEIGHT 500
 
 int main()
 {
-    auto window = sf::RenderWindow{ { 200u, 200u }, "ReturnPong" };
+    auto window = sf::RenderWindow{ { WIDTH, HEIGHT }, "ReturnPong" };
     window.setVerticalSyncEnabled(true);
 
     sf::CircleShape player(5.f);
     player.setFillColor(sf::Color::White);
-    float rotation = 0;
     player.setPosition(window.getSize().x/2.f,window.getSize().y/2.f);
+
+    BlackBall a = BlackBall(sf::Vector2f(WIDTH/2.f, HEIGHT/2.f), 30.f, 10.f, 0, (float)WIDTH, 0, (float)HEIGHT);
 
     while (window.isOpen())
     {
@@ -48,8 +53,13 @@ int main()
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
                 player.move(2,0);
         }
+
+        //Zachowanie kulek
+        a.move();
+
+
         //Czyszczenie ekranu
-        window.clear(sf::Color::Black);
+        window.clear(sf::Color(50,50,50));
 
         sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 
@@ -57,9 +67,10 @@ int main()
             sf::Vertex(sf::Vector2f(player.getPosition().x+5.f,player.getPosition().y+5.f)),
             sf::Vertex(sf::Vector2f(mousePosition))
         };
+
         //float a = (mousePosition.x-player.getPosition().x)/(mousePosition.y-player.getPosition().y);
         
-
+        window.draw(a.circ);
         window.draw(testLine,2,sf::Lines);
         window.draw(player);
         window.display();
