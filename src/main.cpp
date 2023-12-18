@@ -1,4 +1,7 @@
+#include "SFML/Graphics/PrimitiveType.hpp"
 #include "SFML/Graphics/Transform.hpp"
+#include "SFML/Graphics/Vertex.hpp"
+#include "SFML/System/Vector2.hpp"
 #include "SFML/Window/Event.hpp"
 #include "SFML/Window/Keyboard.hpp"
 #include <SFML/Graphics.hpp>
@@ -45,12 +48,19 @@ int main()
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
                 player.move(2,0);
         }
-
-        
-
-
+        //Czyszczenie ekranu
         window.clear(sf::Color::Black);
 
+        sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+
+        sf::Vertex testLine[] = {
+            sf::Vertex(sf::Vector2f(player.getPosition().x+5.f,player.getPosition().y+5.f)),
+            sf::Vertex(sf::Vector2f(mousePosition))
+        };
+        //float a = (mousePosition.x-player.getPosition().x)/(mousePosition.y-player.getPosition().y);
+        
+
+        window.draw(testLine,2,sf::Lines);
         window.draw(player);
         window.display();
     }
