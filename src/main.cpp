@@ -23,11 +23,15 @@ int main()
     //Inicjalizacja okna
     auto window = sf::RenderWindow{ { WIDTH, HEIGHT+10 }, "ReturnPong" };
     window.setVerticalSyncEnabled(true);
+    int gamestate = 0;
 
     //Inicjalizacja gracza
     sf::CircleShape player(5.f);
     player.setFillColor(sf::Color::White);
     player.setPosition(window.getSize().x/2.f,window.getSize().y/2.f);
+
+    //Punkciki !
+    long long int points = 10;
 
     //Inicjalizacja paska ładowania
     sf::RectangleShape teleIndicator;
@@ -82,7 +86,10 @@ int main()
             
             
         }
-
+        
+        if(gamestate == 0){
+        
+        points*=1.1f;
         //Obsługa ruchu gracza
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
                 player.move(0,-2);
@@ -191,22 +198,25 @@ int main()
         for(Ball& a : Standard){
             a.move();
             window.draw(a.circ);
+            if(a.circ.getGlobalBounds().intersects(player.getGlobalBounds())) gamestate = 1;
         }
         for(CurveBall& b : Curving){
             b.move();
             b.skew();
             window.draw(b.circ);
+            if(b.circ.getGlobalBounds().intersects(player.getGlobalBounds())) gamestate = 1;
         }
         for(TrackingBall& c : Tracking){
             c.move();
             c.skew_towards(player.getPosition());
             window.draw(c.circ);
+            if(c.circ.getGlobalBounds().intersects(player.getGlobalBounds())) gamestate = 1;
         }
-
-        
         window.draw(spawnIndicator);
         window.draw(teleIndicator);
         window.draw(player);
+        }
+        
         window.display();
     }
 }
