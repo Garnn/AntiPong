@@ -1,4 +1,6 @@
+#include "SFML/Graphics/Color.hpp"
 #include "SFML/Graphics/PrimitiveType.hpp"
+#include "SFML/Graphics/RectangleShape.hpp"
 #include "SFML/Graphics/Transform.hpp"
 #include "SFML/Graphics/Vertex.hpp"
 #include "SFML/System/Vector2.hpp"
@@ -6,22 +8,49 @@
 #include "SFML/Window/Keyboard.hpp"
 #include <SFML/Graphics.hpp>
 #include <math.h>
+#include <vector>
 #include "SFML/Window/Mouse.hpp"
 #include "balls.cpp"
 
-#define WIDTH 500
-#define HEIGHT 500
+#define WIDTH 800
+#define HEIGHT 600
+#define TELEPORT_COOLDOWN 100
 
 int main()
 {
-    auto window = sf::RenderWindow{ { WIDTH, HEIGHT }, "ReturnPong" };
+    //Inicjalizacja okna
+    auto window = sf::RenderWindow{ { WIDTH, HEIGHT+10 }, "ReturnPong" };
     window.setVerticalSyncEnabled(true);
 
+    //Inicjalizacja gracza
     sf::CircleShape player(5.f);
     player.setFillColor(sf::Color::White);
     player.setPosition(window.getSize().x/2.f,window.getSize().y/2.f);
 
-    BlackBall a = BlackBall(sf::Vector2f(WIDTH/2.f, HEIGHT/2.f), 30.f, 5.f, 0, (float)WIDTH, 0, (float)HEIGHT);
+    //Inicjalizacja paska ładowania
+    sf::RectangleShape tele_indicator;
+    int tele_cooldown = 0;
+    tele_indicator.setFillColor(sf::Color::Cyan);
+    tele_indicator.setPosition(0,HEIGHT);
+
+    //Inicjalizacja generatora liczb pseudolosowych
+
+    //Deklaracja tablic dynamicznych zawierających wszystkie kulki
+
+    int spawning_cooldown=0;
+    std::vector<Ball> Standard;
+    std::vector<CurveBall> Curving;
+    std::vector<TrackingBall> Tracking;
+
+    Ball a = Ball(sf::Vector2f(WIDTH/2.f, HEIGHT/2.f), 30.f, 2.f, 0, (float)WIDTH, 0, (float)HEIGHT);
+
+    CurveBall b = CurveBall(sf::Vector2f(WIDTH/2.f, HEIGHT/2.f), 30.f, 2.f, 0, (float)WIDTH, 0, (float)HEIGHT);
+
+    TrackingBall c = TrackingBall(sf::Vector2f(WIDTH/2.f, HEIGHT/2.f-100), 30.f, 2.f, 0, (float)WIDTH, 0, (float)HEIGHT);
+
+    a.circ.setFillColor(sf::Color::Black);
+    b.circ.setFillColor(sf::Color::Green);
+    c.circ.setFillColor(sf::Color::Red);
 
     while (window.isOpen())
     {
@@ -29,7 +58,7 @@ int main()
         for (auto event = sf::Event{}; window.pollEvent(event);)
         {
 
-            //Wyłączanie programu jeśli użytkownik go zamknie
+            //Wyłączanie programu jeśli użytkownik zamknie okno
             if (event.type == sf::Event::Closed)
             {
                 window.close();
@@ -69,8 +98,6 @@ int main()
             player.setPosition(player.getPosition().x,0);
         }
 
-        //Teleportacja
-        sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 
         // sf::Vertex testLine[] = {
         //     sf::Vertex(sf::Vector2f(player.getPosition().x+5.f,player.getPosition().y+5.f)),
@@ -79,22 +106,40 @@ int main()
 
         // window.draw(testLine,2,sf::Lines);
 
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        //Teleportacja
+        sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !tele_cooldown) {
                 player.setPosition(sf::Vector2f(mousePosition));
+                tele_cooldown=TELEPORT_COOLDOWN;
+        }
+
+        if(tele_cooldown){
+            tele_cooldown-=1;
+        }
+
+        tele_indicator.setSize(sf::Vector2f(((float)tele_cooldown/TELEPORT_COOLDOWN)*WIDTH,10));
+
+        //Dodawanie kulek
+        if (!spawning_cooldown) {
+            
         }
 
         //Zachowanie kulek
         a.move();
-
+        b.move();
+        c.move();
+        b.skew();
+        c.skew_towards(player.getPosition());
 
         //Czyszczenie ekranu
         window.clear(sf::Color(100,100,100));
 
         
-
-        //float a = (mousePosition.x-player.getPosition().x)/(mousePosition.y-player.getPosition().y);
-        
+        window.draw(c.circ);
+        window.draw(b.circ);
         window.draw(a.circ);
+        window.draw(tele_indicator);
         window.draw(player);
         window.display();
     }
