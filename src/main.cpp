@@ -8,6 +8,8 @@
 #include "SFML/Window/Keyboard.hpp"
 #include <SFML/Graphics.hpp>
 #include <math.h>
+#include <stdio.h>
+#include <string>
 #include <variant>
 #include <vector>
 #include "SFML/Window/Mouse.hpp"
@@ -21,17 +23,24 @@
 int main()
 {
     //Inicjalizacja okna
-    auto window = sf::RenderWindow{ { WIDTH, HEIGHT+10 }, "ReturnPong" };
+    auto window = sf::RenderWindow{ { WIDTH, HEIGHT+10 }, "AntiPong" };
     window.setVerticalSyncEnabled(true);
     int gamestate = 0;
+
+    //Ładowanie czcionek
+    sf::Font font;
+    font.loadFromFile("arial.ttf");
 
     //Inicjalizacja gracza
     sf::CircleShape player(5.f);
     player.setFillColor(sf::Color::White);
-    player.setPosition(window.getSize().x/2.f,window.getSize().y/2.f);
+    player.setPosition(WIDTH/2.f,HEIGHT/2.f);
 
     //Punkciki !
     long long int points = 10;
+    sf::Text pointDisplay;
+    pointDisplay.setFont(font);
+    pointDisplay.setCharacterSize(20);
 
     //Inicjalizacja paska ładowania
     sf::RectangleShape teleIndicator;
@@ -89,7 +98,9 @@ int main()
         
         if(gamestate == 0){
         
-        points*=1.1f;
+        points+=1;
+        std::string pointsString = "Punkty:" + std::to_string(points);
+        pointDisplay.setString(pointsString);
         //Obsługa ruchu gracza
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
                 player.move(0,-2);
@@ -215,8 +226,19 @@ int main()
         window.draw(spawnIndicator);
         window.draw(teleIndicator);
         window.draw(player);
+        window.draw(pointDisplay);
+        window.display();
+        }
+        if (gamestate==1 && sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+            points = 10;
+            teleCooldown = 0;
+            player.setPosition(WIDTH/2.f,HEIGHT/2.f);
+            Standard.clear();
+            Curving.clear();
+            Tracking.clear();
+            spawningCooldown=0;
+            gamestate = 0;
         }
         
-        window.display();
     }
 }
