@@ -12,6 +12,7 @@ FetchContent_MakeAvailable(SFML)
 
 add_executable(AntiPong src/main.cpp)
 target_link_libraries(AntiPong PRIVATE sfml-graphics)
+target_link_libraries(AntiPong PRIVATE sfml-audio)
 target_compile_features(AntiPong PRIVATE cxx_std_17)
 
 if(WIN32)

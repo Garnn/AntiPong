@@ -1,3 +1,4 @@
+#include "SFML/Audio/Sound.hpp"
 #include "SFML/Graphics/Color.hpp"
 #include "SFML/Graphics/PrimitiveType.hpp"
 #include "SFML/Graphics/RectangleShape.hpp"
@@ -15,6 +16,7 @@
 #include "SFML/Window/Mouse.hpp"
 #include <random>
 #include "balls.cpp"
+#include <SFML/Audio.hpp>
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -30,6 +32,12 @@ int main()
     //Ładowanie czcionek
     sf::Font font;
     font.loadFromFile("arial.ttf");
+
+    //Ładowanie dźwięku
+    sf::SoundBuffer buffer;
+    buffer.loadFromFile("Nudge.wav");
+    sf::Sound hitSound;
+    hitSound.setBuffer(buffer);
 
     //Inicjalizacja gracza
     sf::CircleShape player(5.f);
@@ -209,19 +217,28 @@ int main()
         for(Ball& a : Standard){
             a.move();
             window.draw(a.circ);
-            if(a.circ.getGlobalBounds().intersects(player.getGlobalBounds())) gamestate = 1;
+             if(a.circ.getGlobalBounds().intersects(player.getGlobalBounds())){
+                gamestate = 1;
+                hitSound.play();
+            }
         }
         for(CurveBall& b : Curving){
             b.move();
             b.skew();
             window.draw(b.circ);
-            if(b.circ.getGlobalBounds().intersects(player.getGlobalBounds())) gamestate = 1;
+            if(b.circ.getGlobalBounds().intersects(player.getGlobalBounds())){
+                gamestate = 1;
+                hitSound.play();
+            }
         }
         for(TrackingBall& c : Tracking){
             c.move();
             c.skew_towards(player.getPosition());
             window.draw(c.circ);
-            if(c.circ.getGlobalBounds().intersects(player.getGlobalBounds())) gamestate = 1;
+            if(c.circ.getGlobalBounds().intersects(player.getGlobalBounds())){
+                gamestate = 1;
+                hitSound.play();
+            }
         }
         window.draw(spawnIndicator);
         window.draw(teleIndicator);
