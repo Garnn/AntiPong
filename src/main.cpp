@@ -10,6 +10,7 @@
 #include <math.h>
 #include <vector>
 #include "SFML/Window/Mouse.hpp"
+#include <random>
 #include "balls.cpp"
 
 #define WIDTH 800
@@ -28,16 +29,22 @@ int main()
     player.setPosition(window.getSize().x/2.f,window.getSize().y/2.f);
 
     //Inicjalizacja paska ładowania
-    sf::RectangleShape tele_indicator;
-    int tele_cooldown = 0;
-    tele_indicator.setFillColor(sf::Color::Cyan);
-    tele_indicator.setPosition(0,HEIGHT);
+    sf::RectangleShape teleIndicator;
+    int teleCooldown = 0;
+    teleIndicator.setFillColor(sf::Color::Cyan);
+    teleIndicator.setPosition(0,HEIGHT);
 
     //Inicjalizacja generatora liczb pseudolosowych
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<> screenAreaX(0,WIDTH);
+    std::uniform_int_distribution<> screenAreaY(0,HEIGHT);
+    std::uniform_real_distribution<> randomDegree(0,360);
+    std::uniform_real_distribution<> randomSpeed(0,5);
 
     //Deklaracja tablic dynamicznych zawierających wszystkie kulki
 
-    int spawning_cooldown=0;
+    int spawningCooldown=0;
     std::vector<Ball> Standard;
     std::vector<CurveBall> Curving;
     std::vector<TrackingBall> Tracking;
@@ -109,19 +116,19 @@ int main()
         //Teleportacja
         sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !tele_cooldown) {
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !teleCooldown) {
                 player.setPosition(sf::Vector2f(mousePosition));
-                tele_cooldown=TELEPORT_COOLDOWN;
+                teleCooldown=TELEPORT_COOLDOWN;
         }
 
-        if(tele_cooldown){
-            tele_cooldown-=1;
+        if(teleCooldown){
+            teleCooldown-=1;
         }
 
-        tele_indicator.setSize(sf::Vector2f(((float)tele_cooldown/TELEPORT_COOLDOWN)*WIDTH,10));
+        teleIndicator.setSize(sf::Vector2f(((float)teleCooldown/TELEPORT_COOLDOWN)*WIDTH,10));
 
         //Dodawanie kulek
-        if (!spawning_cooldown) {
+        if (!spawningCooldown) {
             
         }
 
@@ -139,7 +146,7 @@ int main()
         window.draw(c.circ);
         window.draw(b.circ);
         window.draw(a.circ);
-        window.draw(tele_indicator);
+        window.draw(teleIndicator);
         window.draw(player);
         window.display();
     }
