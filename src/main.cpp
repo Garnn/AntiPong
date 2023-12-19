@@ -8,6 +8,7 @@
 #include "SFML/Window/Keyboard.hpp"
 #include <SFML/Graphics.hpp>
 #include <math.h>
+#include <variant>
 #include <vector>
 #include "SFML/Window/Mouse.hpp"
 #include <random>
@@ -40,24 +41,32 @@ int main()
     std::uniform_int_distribution<> screenAreaX(0,WIDTH);
     std::uniform_int_distribution<> screenAreaY(0,HEIGHT);
     std::uniform_real_distribution<> randomDegree(0,360);
-    std::uniform_real_distribution<> randomSpeed(0,5);
+    std::uniform_real_distribution<> randomSpeed(2,5);
+    std::uniform_int_distribution<> ballType(0,2);
 
     //Deklaracja tablic dynamicznych zawierających wszystkie kulki
 
     int spawningCooldown=0;
+    int spawning;
+    int variant;
+    sf::Vector2f spawnPosition;
+    float spawnDegree;
+    float spawnSpeed;
+    sf::RectangleShape spawnIndicator(sf::Vector2f(10,10));
+    spawnIndicator.setFillColor(sf::Color::Yellow);
     std::vector<Ball> Standard;
     std::vector<CurveBall> Curving;
     std::vector<TrackingBall> Tracking;
 
-    Ball a = Ball(sf::Vector2f(WIDTH/2.f, HEIGHT/2.f), 30.f, 2.f, 0, (float)WIDTH, 0, (float)HEIGHT);
+    // Ball a = Ball(sf::Vector2f(WIDTH/2.f, HEIGHT/2.f), 30.f, 2.f, 0, (float)WIDTH, 0, (float)HEIGHT);
 
-    CurveBall b = CurveBall(sf::Vector2f(WIDTH/2.f, HEIGHT/2.f), 30.f, 2.f, 0, (float)WIDTH, 0, (float)HEIGHT);
+    // CurveBall b = CurveBall(sf::Vector2f(WIDTH/2.f, HEIGHT/2.f), 30.f, 2.f, 0, (float)WIDTH, 0, (float)HEIGHT);
 
-    TrackingBall c = TrackingBall(sf::Vector2f(WIDTH/2.f, HEIGHT/2.f-100), 30.f, 2.f, 0, (float)WIDTH, 0, (float)HEIGHT);
+    // TrackingBall c = TrackingBall(sf::Vector2f(WIDTH/2.f, HEIGHT/2.f-100), 30.f, 2.f, 0, (float)WIDTH, 0, (float)HEIGHT);
 
-    a.circ.setFillColor(sf::Color::Black);
-    b.circ.setFillColor(sf::Color::Green);
-    c.circ.setFillColor(sf::Color::Red);
+    // a.circ.setFillColor(sf::Color::Black);
+    // b.circ.setFillColor(sf::Color::Green);
+    // c.circ.setFillColor(sf::Color::Red);
 
     while (window.isOpen())
     {
@@ -130,22 +139,72 @@ int main()
         //Dodawanie kulek
         if (!spawningCooldown) {
             
-        }
+            int roll = ballType(generator);
+            variant = roll;
 
-        //Zachowanie kulek
-        a.move();
-        b.move();
-        c.move();
-        b.skew();
-        c.skew_towards(player.getPosition());
+            spawnPosition = sf::Vector2f(screenAreaX(generator),screenAreaY(generator));
+            spawnDegree = randomDegree(generator);
+            spawnSpeed = randomSpeed(generator);
+
+            switch (roll) {
+                case 0:
+                spawningCooldown = 200;
+                break;
+                case 1:
+                spawningCooldown = 400;
+                break;
+                case 2:
+                spawningCooldown = 800;
+                break;
+            }
+
+            spawning = 100;
+        }
+        spawningCooldown--;
+
+        if(spawning>0){
+            spawning--;
+            spawnIndicator.setPosition(spawnPosition);
+        }
+        else if (spawning == 0){
+            switch (variant) {
+                case 0:
+                Standard.push_back(Ball(spawnPosition,spawnDegree,spawnSpeed,0,(float)WIDTH,0,(float)HEIGHT,sf::Color::Black));
+                break;
+                case 1:
+                Curving.push_back(CurveBall(spawnPosition,spawnDegree,spawnSpeed,0,(float)WIDTH,0,(float)HEIGHT,sf::Color::Green));
+                break;
+                case 2:
+                Tracking.push_back(TrackingBall(spawnPosition,spawnDegree,spawnSpeed,0,(float)WIDTH,0,(float)HEIGHT,sf::Color::Red));
+                break;
+            }
+            spawning=-1;
+        }
+        else{
+            spawnIndicator.setPosition(sf::Vector2f(-100,-100));
+        }
 
         //Czyszczenie ekranu
         window.clear(sf::Color(100,100,100));
 
+        //Zachowanie kulek
+        for(Ball& a : Standard){
+            a.move();
+            window.draw(a.circ);
+        }
+        for(CurveBall& b : Curving){
+            b.move();
+            b.skew();
+            window.draw(b.circ);
+        }
+        for(TrackingBall& c : Tracking){
+            c.move();
+            c.skew_towards(player.getPosition());
+            window.draw(c.circ);
+        }
+
         
-        window.draw(c.circ);
-        window.draw(b.circ);
-        window.draw(a.circ);
+        window.draw(spawnIndicator);
         window.draw(teleIndicator);
         window.draw(player);
         window.display();

@@ -42,11 +42,12 @@ class Ball{
         sf::CircleShape circ;
 
         //Konstruktor
-        Ball(sf::Vector2f position, float direction, float speed, int lowerXLim, int upperXLim, int lowerYLim, int upperYLim){
+        Ball(sf::Vector2f position, float direction, float speed, int lowerXLim, int upperXLim, int lowerYLim, int upperYLim, sf::Color color){
             _position = position;
             _direction = direction;
             _speed = speed;
             circ = sf::CircleShape(5.f);
+            circ.setFillColor(color);
             _lowerXLim = lowerXLim;
             _upperXLim = upperXLim;
             _lowerYLim = lowerYLim;
